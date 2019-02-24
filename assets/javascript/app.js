@@ -200,7 +200,7 @@
     // Add additional buttons
     $("form").on("submit",function(e){
       e.preventDefault();
-      var value = $("form input").val().trim();
+      var value = $("form input").val().trim().toLowerCase();
       $("form input").val("");
       if(value && topics.indexOf(value) === -1){
         topics.push(value);
