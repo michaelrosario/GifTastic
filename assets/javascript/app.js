@@ -1,38 +1,5 @@
-function forceDownload(blob, filename) {
-  var a = document.createElement('a');
-  a.download = filename;
-  a.href = blob;
-  // For Firefox https://stackoverflow.com/a/32226068
-  document.body.appendChild(a);
-  a.click();
-  a.remove();
-}
-
-// Current blob size limit is around 500MB for browsers
-function downloadResource(url, filename) {
-  if (!filename) filename = url.split('\\').pop().split('/').pop();
-  fetch(url, {
-      headers: new Headers({
-        'Origin': location.origin
-      }),
-      mode: 'cors'
-    })
-    .then(response => response.blob())
-    .then(blob => {
-      let blobUrl = window.URL.createObjectURL(blob);
-      forceDownload(blobUrl, filename);
-    })
-    .catch(e => console.error(e));
-}
-
-    $(document).on("click",".download",function(e){
-      e.preventDefault();
-      downloadResource($(this).attr("href"),$(this).attr("download"));
-    });
-
+    // Load topics from localStorage if available
     var topics = window.localStorage.getItem("animals");
-    var favorites = window.localStorage.getItem("favoriteItems");
-
     if(!topics){
       topics = [
         "dogs",
@@ -42,24 +9,33 @@ function downloadResource(url, filename) {
     } else {
       topics = topics.split(",");
     }
-  
-    generateButtons(topics);
+    
+    // Run function to add and update localStorage with buttons
+    generateButtons(topics); 
 
-    function generateButtons(arr){
-      localStorage.setItem('animals', arr);
-      $("#button-lists").empty();
-      for(var i = 0; i < arr.length; i++){
-        var btn = $("<button>");
-        btn.attr("data-animal",arr[i]);
-        btn.html(arr[i]+"<i class='fa fa-trash'></i>");
-        $("#button-lists").append(btn);
+    // Load favorites from localStorage if available
+    var favorites = window.localStorage.getItem("favoriteItems");
+    $(document).ready(function(){
+      if(favorites){
+        var content = $(favorites);
+        var container = $("#gifs-appear-here");
+        container.masonry("destroy").append(content)
+        .imagesLoaded(function () {
+          container.masonry({itemSelector: '.gifImage'}); 
+        });
       }
-    }
+    });
 
-    var offset = 0;
+    // Download ckicked image
+    $(document).on("click",".download",function(e){
+      e.preventDefault();
+      downloadResource($(this).attr("href"),$(this).attr("download"));
+    });
+   
+    var offset = 0; // global offset variable
 
+    // Button clicks for offset and buttons
     $(document).on("click","button", function() {
-      
       if($(this).hasClass("offset")){
         // Load with offset
         offset=offset+10;
@@ -72,15 +48,20 @@ function downloadResource(url, filename) {
         $("#gifs-appear-here").masonry('destroy');
       }
 
+      // get data from buttons and create elements
       var animal = $(this).attr("data-animal");
       var elements = $("<div>");
 
+      // for additional giphy images
       $("#loadAdditional button").find("span").text(animal);
       $("#loadAdditional button").attr('data-animal',animal);
       $("#loadAdditional").fadeIn();
+      
+      // API Variables & Query
       var apiKey = 'THXk3SHSIk0wxK9Q64Ut747j8qq0p9ZD';
       var queryURL = `https://api.giphy.com/v1/gifs/search?q=${animal}&api_key=${apiKey}&limit=10&offset=${offset}`;
 
+      // Query Giphy API
       $.ajax({
         url: queryURL,
         method: "GET"
@@ -95,10 +76,11 @@ function downloadResource(url, filename) {
 
             if($("#"+results[i].id).length){
 
-              console.log("duplicate image found");
+              // check for duplicate items from favorited items
 
             } else {
 
+            // create the elements
             var animalDiv = $("<div>");
             var animalImage = $("<img>");
             var animalRating = $("<p>");
@@ -130,33 +112,29 @@ function downloadResource(url, filename) {
               .append(favorite)
               .append(download);
             
-            console.log("results[i].id",results[i].id);
-
+            // if we are appending or starting from empty
             if(offset > 0){               
               container.append(animalDiv).masonry( 'appended', animalDiv, true ).masonry();   
             } else {
               container.prepend(animalDiv);
             }
-          
+
           }
-    
-            if(i === results.length-1){
-              console.log("masonry run");
-        
-                container.imagesLoaded(function () {
-                  container.masonry({
-                    itemSelector: '.gifImage',
-                    animate: true
-                  });
-                });
-            
-            
-            }
+          // When we are on the last item of the loop
+          if(i === results.length-1){
+            container.imagesLoaded(function () {
+              container.masonry({
+                itemSelector: '.gifImage',
+                animate: true                
+              });
+            });
+          }
         }
 
       });
     });
 
+    // When a favorite is clicked, we save/remove to localStorage
     $(document).on("click","a.favorite", function() {
 
       if($(this).parent().hasClass("favorite")){
@@ -175,18 +153,20 @@ function downloadResource(url, filename) {
       } else {
         window.localStorage.removeItem("favoriteItems");
       }
-     
 
     });
 
+    // clicking on images, we switch from static to play and vice-versa
     $(document).on("click","img", function() {
       
+      // variables to perform the switch
       var animatedImg = $(this).attr("data-animated");
       var previousImg = $(this).attr("src"); //switch
       $(this).attr("data-animated",previousImg);
 
       var checkAnimated = animatedImg;
 
+      // switch images from static to play
       if($(this).parent().hasClass("animated")){
         $(this).parent().removeClass("animated");
         $(this).attr("src",animatedImg);
@@ -197,32 +177,27 @@ function downloadResource(url, filename) {
         checkAnimated = animatedImg;
       }
 
+      // switch off all gifs except selected one
       $(".gifImage.animated").each(function(){
-        console.log("switch ran");
         var staticImage = $(this).find("img").attr("data-animated");
         var animatedImage = $(this).find("img").attr("src"); //switch
-
         if(checkAnimated != animatedImage){
           $(this).find("img").attr("data-animated",animatedImage);
           $(this).find("img").attr("src",staticImage);
           $(this).removeClass("animated");
         }
       });
-        
-  
-      console.log("masonry run");
-              var container =  $("#gifs-appear-here");
-              container.imagesLoaded(function () {
-                container.masonry({
-                  itemSelector: '.gifImage'
-                });
-              });
+      
+      // use masonry plugin to organize different sized images
+      var container =  $("#gifs-appear-here");
+      container.imagesLoaded(function () {
+        container.masonry({
+          itemSelector: '.gifImage'
+        });
+      });
     });
 
-    $(document).on("click",".submit", function() {
-      $("form").submit();
-    });
-    
+    // Add additional buttons
     $("form").on("submit",function(e){
       e.preventDefault();
       var value = $("form input").val().trim();
@@ -231,9 +206,14 @@ function downloadResource(url, filename) {
         topics.push(value);
         generateButtons(topics);
       }
-
     });
 
+    // Trigger form submit
+    $(document).on("click",".submit", function() {
+      $("form").submit();
+    });
+
+    // Remove buttons and update localStorage
     $(document).on("click",".fa-trash", function(e) {
       e.preventDefault();
       $(this).parent().remove();
@@ -243,14 +223,45 @@ function downloadResource(url, filename) {
       return false;
     });
 
-    $(document).ready(function(){
-      if(favorites){
-        var content = $(favorites);
-        var container = $("#gifs-appear-here");
-        container.masonry("destroy").append(content)
-        .imagesLoaded(function () {
-          container.masonry({itemSelector: '.gifImage'}); 
-        });
+     // function to load the buttons
+     function generateButtons(arr){
+      localStorage.setItem('animals', arr);
+      $("#button-lists").empty();
+      for(var i = 0; i < arr.length; i++){
+        var btn = $("<button>");
+        btn.attr("data-animal",arr[i]);
+        btn.html(arr[i]+"<i class='fa fa-trash'></i>");
+        $("#button-lists").append(btn);
       }
-    });
+    }
+
+
+    // function to allow download from Cross Domain
+    function forceDownload(blob, filename) {
+      var a = document.createElement('a');
+      a.download = filename;
+      a.href = blob;
+      // For Firefox https://stackoverflow.com/a/32226068
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
+    }
+    
+    // Current blob size limit is around 500MB for browsers
+    function downloadResource(url, filename) {
+      if (!filename) filename = url.split('\\').pop().split('/').pop();
+      fetch(url, {
+          headers: new Headers({
+            'Origin': location.origin
+          }),
+          mode: 'cors'
+        })
+        .then(response => response.blob())
+        .then(blob => {
+          let blobUrl = window.URL.createObjectURL(blob);
+          forceDownload(blobUrl, filename);
+        })
+        .catch(e => console.error(e));
+    }
+    
     

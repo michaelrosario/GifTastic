@@ -1,16 +1,19 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
   <meta charset="utf-8">
-  <title>Animal Buttons</title>
+  <title>GifTastic!</title>
   <meta name="viewport" content="width=device-width, initial-scale=1">
+  
+  <!-- CSS Stylesheets -->
   <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.7.2/css/all.css" integrity="sha384-fnmOCqbTlWIlj8LyTjo7mOUStjsKC4pOpQbqyi7RrhN7udi9RwhKkMHpvLbHG9Sr" crossorigin="anonymous">
   <link rel="stylesheet" href="./assets/css/styles.css">
-</head>
 
+</head>
 <body>
+  
   <h1>GifTastic!</h1>
+  
   <form>
       <input 
         name="moreButtons" 
@@ -20,20 +23,25 @@
       <a href=#" class="submit"><i class="fa fa-plus"></i></a>
   </form>
   
-  <div id="button-lists">
-  </div>
+  <div id="button-lists"></div>
   
   <div id="gifs-appear-here" 
     class="js-masonry"
     data-masonry-options='{ "columnWidth": 310, "itemSelector": "img" }'>
   </div>
+
   <div id="loadAdditional" style="display: none;">
-    <button class="offset" data-animal=""><i class="far fa-image"></i> &nbsp; Load Additional <span></span> Gifs</button>
+    <button class="offset" data-animal="">
+      <i class="far fa-image"></i> &nbsp; Load Additional <span></span> Gifs
+    </button>
   </div>
+
+  <!-- Javascript -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery.imagesloaded/3.1.8/imagesloaded.pkgd.min.js"></script>
   <script src="./assets/javascript/masonry.pkgd.min.js"></script>
   <script src="./assets/javascript/app.js"></script>
+
 </body>
 
 </html>

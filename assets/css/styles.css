@@ -106,6 +106,7 @@
       height: auto; 
       border-radius: 10px; 
       border: 2px solid #666; }
+    
     img:hover { 
       border-color: #FFF; 
     }
@@ -129,7 +130,7 @@
       display: block;
       position: absolute; 
       right: 8px;
-      top: 8px;
+      top: 9px;
       float: left;
     }
     button:hover .fa-trash:hover {
