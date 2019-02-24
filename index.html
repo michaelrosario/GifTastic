@@ -5,188 +5,35 @@
   <meta charset="utf-8">
   <title>Animal Buttons</title>
   <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.7.2/css/all.css" integrity="sha384-fnmOCqbTlWIlj8LyTjo7mOUStjsKC4pOpQbqyi7RrhN7udi9RwhKkMHpvLbHG9Sr" crossorigin="anonymous">
+  <link rel="stylesheet" href="./assets/css/styles.css">
 </head>
 
 <body>
   <h1>GifTastic!</h1>
+  <form>
+      <input 
+        name="moreButtons" 
+        id="addButtons"
+        placeholder="Add additional search buttons..."
+      />
+      <a href=#" class="submit"><i class="fa fa-plus"></i></a>
+  </form>
+  
   <div id="button-lists">
   </div>
   
   <div id="gifs-appear-here" 
     class="js-masonry"
     data-masonry-options='{ "columnWidth": 310, "itemSelector": "img" }'>
-
+  </div>
+  <div id="loadAdditional" style="display: none;">
+    <button class="offset" data-animal=""><i class="far fa-image"></i> &nbsp; Load Additional <span></span> Gifs</button>
   </div>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery.imagesloaded/3.1.8/imagesloaded.pkgd.min.js"></script>
   <script src="./assets/javascript/masonry.pkgd.min.js"></script>
-  <script type="text/javascript">
-
-    var topics = [
-      "dogs",
-      "cats",
-      "mouse"
-    ];
-    
-    generateButtons(topics);
-
-    function generateButtons(arr){
-      for(var i = 0; i < arr.length; i++){
-        var btn = $("<button>");
-        btn.attr("data-animal",arr[i]);
-        btn.text(arr[i]);
-        $("#button-lists").append(btn);
-      }
-    }
-
-    $("button").on("click", function() {
-      var animal = $(this).attr("data-animal");
-      var queryURL = "https://api.giphy.com/v1/gifs/search?q=" +
-        animal + "&api_key=THXk3SHSIk0wxK9Q64Ut747j8qq0p9ZD&limit=10";
-
-      $.ajax({
-        url: queryURL,
-        method: "GET"
-      }).then(function(response) {
-      
-        console.log(response);
-        var results = response.data;
-
-        $("#gifs-appear-here").masonry( 'destroy' );
-        
-        for (var i = 0; i < results.length; i++) {
-            
-            var animalDiv = $("<div>");
-            var animalImage = $("<img>");
-            animalImage
-              .attr("src",results[i].images.fixed_height_still.url)
-              .attr("data-animated",results[i].images.fixed_height.url);
-            animalDiv
-              .addClass("gifImage")
-              .prepend(animalImage);
-            $("#gifs-appear-here").prepend(animalDiv);
-
-            if(i === results.length-1){
-              console.log("masonry run");
-              var container =  $("#gifs-appear-here");
-              container.imagesLoaded(function () {
-                container.masonry({
-                  itemSelector: '.gifImage'
-                });
-              });
-            
-            }
-        }
-
-      });
-    });
-
-    $(document).on("click","img", function() {
-      
-      var animatedImg = $(this).attr("data-animated");
-      var previousImg = $(this).attr("src"); //switch
-      $(this).attr("data-animated",previousImg);
-
-      var checkAnimated = animatedImg;
-
-      if($(this).parent().hasClass("animated")){
-        $(this).parent().removeClass("animated");
-        $(this).attr("src",animatedImg);
-        checkAnimated = previousImg;
-      } else {
-        $(this).parent().addClass("animated");
-        $(this).attr("src",animatedImg);
-        checkAnimated = animatedImg;
-      }
-
-      $(".gifImage.animated").each(function(){
-        console.log("switch ran");
-        var staticImage = $(this).find("img").attr("data-animated");
-        var animatedImage = $(this).find("img").attr("src"); //switch
-
-        if(checkAnimated != animatedImage){
-          $(this).find("img").attr("data-animated",animatedImage);
-          $(this).find("img").attr("src",staticImage);
-          $(this).removeClass("animated");
-        }
-      });
-        
-      
-
-      console.log("masonry run");
-              var container =  $("#gifs-appear-here");
-              container.imagesLoaded(function () {
-                container.masonry({
-                  itemSelector: '.gifImage'
-                });
-              });
-    });
-  </script>
-  <style>
-    * { 
-      box-sizing: border-box;
-    }
-    html, body { background: #000; }
-    h1 { 
-      display: block; 
-      color: #FFF; 
-      text-align: center; 
-      font-size: 50px; 
-      padding: 0 0 10px 0;
-      margin: 0;
-    }
-    #gifs-appear-here { 
-      display: block; 
-      width: 90%; 
-      text-align: 
-      center; 
-      margin: 0 auto; 
-    }
-    .gifImage { 
-      width: 20%; 
-      opacity: 0.4;
-      padding: 0 10px 15px; 
-      display: inline-block; 
-      position: relative; 
-      cursor: pointer;
-    }
-    .gifImage:hover { opacity: 0.9; }
-    .gifImage.animated { width: 40%; opacity: 1; } 
-    p { position: absolute; width: 100%; bottom: 10px; }
-    img { 
-      transition: all .04s linear;
-      display: inline-block;
-      width: 100%; 
-      height: auto; 
-      border-radius: 10px; 
-      border: 2px solid #666; }
-    img:hover { 
-      border-color: #FFF; 
-    }
-
-    #button-lists {
-      display: block; width: 100%;
-      text-align: center;
-      padding: 0 0 20px 0;
-    }
-    button {
-      height: 30px; margin: 0 5px;
-      border-radius: 5px;
-      width: 100px;
-      text-align: center;
-    }
-
-    @media (max-width: 676px){
-      .gifImage { width: 25%; }
-      .gifImage.animated { width: 50%; }
-    }
-
-    @media (max-width: 300px){
-      .gifImage { width: 25%; }
-      .gifImage.animated { width: 100%; }
-    }
-
-  </style>
+  <script src="./assets/javascript/app.js"></script>
 </body>
 
 </html>
