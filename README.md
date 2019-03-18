@@ -8,3 +8,7 @@
 - User clicks on image to play/stop Giphy Images<br>
 - Download is available to user<br>
 - User can query 10 additional images<br>
+<br><br>
+<hr>
+View GifTastic at:<br>
+https://michaelrosario.github.io/GifTastic/index.html
